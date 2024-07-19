@@ -4,6 +4,20 @@ import { Database } from "./database.js";
 
 const database = new Database()
 
+export function createDate(){
+    const ts = Date.now();
+
+    const date_time = new Date(ts);
+    const day = date_time.getDate();
+    const month = date_time.getMonth() + 1;
+    const year = date_time.getFullYear();
+    
+    const dayMonthYear = day + "/" + month + "/" + year
+
+    return dayMonthYear
+
+}
+
 export const routes = [
     {
         method: 'GET',
@@ -21,23 +35,18 @@ export const routes = [
         handler: (req, res) => {
             const { title, description } = req.body;
 
-            const ts = Date.now();
+            const dateNow = createDate()
 
-            const date_time = new Date(ts);
-            const day = date_time.getDate();
-            const month = date_time.getMonth() + 1;
-            const year = date_time.getFullYear();
-
-            const user = {
+            const task = {
                 id: randomUUID(),
                 title,
                 description,
                 completed_at: null,
-                created_at: day + "/" + month + "/" + year,
-                updated_at: day + "/" + month + "/" + year,
+                created_at: dateNow,
+                updated_at: dateNow,
             }
             
-            database.insert('tasks', user);
+            database.insert('tasks', task);
 
             return res.writeHead(201).end();
         }
@@ -48,9 +57,12 @@ export const routes = [
         handler: (req, res) => {
             
             const { id } = req.params
-            const { title, description } = req.body
             
-            return res.end()
+            if (req.body){
+                    database.update('tasks', id, req.body)
+            }
+
+            return res.writeHead(204).end()
         }
     },
     {
@@ -58,7 +70,11 @@ export const routes = [
         path: buildRoutePath('/tasks/:id'),
         handler: (req, res) => {
             
-            return res.end()
+            const { id } = req.params
+
+            database.delete('tasks', id)
+
+            return res.writeHead(204).end()
         }
     },
     {
@@ -66,7 +82,10 @@ export const routes = [
         path: buildRoutePath('/tasks/:id/complete'),
         handler: (req, res) => {
             
-            return res.end()
+            const { id } = req.params
+
+            database.update('tasks', id, {})
+            return res.writeHead(204).end()
         }
     },
 ]
