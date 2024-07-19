@@ -34,7 +34,7 @@ export const routes = [
         path: buildRoutePath('/tasks'),
         handler: (req, res) => {
             const { title, description } = req.body;
-
+            console.log('entrou')
             const dateNow = createDate()
 
             const task = {
