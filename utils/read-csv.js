@@ -1,26 +1,27 @@
 import fs from 'node:fs'
-import { parse as csvParse } from 'csv-parse'
+import { parse } from 'csv-parse'
 
 const csvPath = new URL('../files/tasks.csv', import.meta.url)
 
-const processFile = async () => {
+async function processFile (){
     const records = [];
-    const parse = fs.createReadStream(csvPath).pipe(csvParse({
-        delimiter: ',',
-        encoding: 'utf8',
-        from_line: 2
-    }))
+    const parseFile = fs.createReadStream(csvPath).pipe(parse({from_line: 2}))
+    
 
-    /*
-    for await(const line of parse){
-        records.push(line);
+    for await(const chunk of parseFile){
+        records.push(chunk);
+        fetch('http://localhost:3333/tasks', {
+            method: 'POST',
+            body: JSON.stringify({
+                title: chunk[0],
+                description: chunk[1],
+            }),
+        })
     }
-    */
+
     return records
 }
 
-(async () => {
-    const records = await processFile();
-    console.log(records);
-})();
+processFile()
+
 

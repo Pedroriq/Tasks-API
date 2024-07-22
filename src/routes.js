@@ -33,21 +33,23 @@ export const routes = [
         method: 'POST',
         path: buildRoutePath('/tasks'),
         handler: (req, res) => {
-            const { title, description } = req.body;
-            console.log('entrou')
-            const dateNow = createDate()
+            if ('title' in req.body && 'description' in req.body){
+                const { title, description } = req.body;
+                const dateNow = createDate()
 
-            const task = {
-                id: randomUUID(),
-                title,
-                description,
-                completed_at: null,
-                created_at: dateNow,
-                updated_at: dateNow,
-            }
+                const task = {
+                    id: randomUUID(),
+                    title,
+                    description,
+                    completed_at: null,
+                    created_at: dateNow,
+                    updated_at: dateNow,
+                }
             
-            database.insert('tasks', task);
-
+                database.insert('tasks', task);
+            } else {
+                console.log("Verificar se os campos title e description estão presentes no corpo da requisição")
+            }
             return res.writeHead(201).end();
         }
     },
@@ -60,6 +62,8 @@ export const routes = [
             
             if (req.body){
                     database.update('tasks', id, req.body)
+            } else {
+                console.log('Verificar se os campos title ou description estão preenchidos')
             }
 
             return res.writeHead(204).end()
