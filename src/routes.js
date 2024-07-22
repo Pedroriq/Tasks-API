@@ -60,7 +60,7 @@ export const routes = [
             
             const { id } = req.params
             
-            if (req.body){
+            if (Object.keys(req.body).length != 0){
                     database.update('tasks', id, req.body)
             } else {
                 console.log('Verificar se os campos title ou description estão preenchidos')
